@@ -131,46 +131,38 @@ disponibles: `read_file`/`read_text_file`, `read_multiple_files`, `read_media_fi
 `list_directory_with_sizes`, `directory_tree`, `move_file`, `search_files`,
 `get_file_info`, `list_allowed_directories`.
 
-_[PENDIENTE — captura de esa respuesta listando las herramientas]_
-
 ### 2. Listar el contenido del directorio autorizado
 
-Herramienta usada: `list_directory` sobre `workspace/`. Resultado:
-```
-[FILE] README.md
-```
-_[PENDIENTE — captura]_
+Herramienta usada: `list_directory` sobre `workspace/`.
+
+![Listar directorio](img/02-listar-directorio.png)
 
 ### 3. Leer un archivo existente
 
-Herramienta usada: `read_text_file` sobre `workspace/README.md`. Devolvió el contenido
-completo del archivo correctamente.
-_[PENDIENTE — captura]_
+Herramienta usada: `read_text_file` sobre `workspace/README.md`.
+
+![Leer archivo](img/03-leer-archivo.png)
 
 ### 4. Crear un archivo nuevo y escribir contenido
 
 Herramienta usada: `write_file` para crear `workspace/nota-demo.txt` con contenido
-nuevo. Resultado: `Successfully wrote to ...\workspace\nota-demo.txt`.
-_[PENDIENTE — captura]_
+nuevo.
+
+![Crear archivo](img/04-crear-archivo.png)
 
 ### 5. Modificar un archivo existente
 
 Herramienta usada: `edit_file` sobre `workspace/nota-demo.txt`, agregando una línea. La
 herramienta devolvió un diff estilo git confirmando el cambio exacto:
-```diff
- Este archivo fue creado por el modelo a traves de la herramienta write_file
- del servidor MCP de sistema de archivos, como evidencia de la Parte 2 de la actividad.
 
- Fecha de la demostracion: 2026-09-20
-+Esta linea se agrego despues, usando la herramienta edit_file, para demostrar la operacion de modificacion de un archivo existente.
-```
-_[PENDIENTE — captura]_
+![Modificar archivo](img/05-modificar-archivo.png)
 
 ### 6. Buscar un archivo por nombre o contenido
 
 Herramienta usada: `search_files` con el patrón `*demo*` sobre `workspace/`. Encontró
 `workspace/nota-demo.txt`.
-_[PENDIENTE — captura]_
+
+![Buscar archivo](img/06-buscar-archivo.png)
 
 ## 4. Prueba del límite de seguridad
 
@@ -194,7 +186,7 @@ permitidos, antes incluso de comprobar si el archivo existe. El modelo nunca lle
 tocar el sistema de archivos fuera del alcance autorizado; solo recibió, como cualquier
 otro resultado de herramienta, el mensaje de error como texto.
 
-_[PENDIENTE — captura de este intercambio]_
+![Prueba del límite de seguridad](img/07-prueba-limite-seguridad.png)
 
 ## Servidor MCP propio (opcional)
 
