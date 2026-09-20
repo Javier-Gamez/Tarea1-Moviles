@@ -1,0 +1,170 @@
+# Actividad: MCP y el servidor de sistema de archivos
+
+## Datos de identificación
+
+- **Nombre completo:** _[PENDIENTE — completar]_
+- **Número de boleta:** _[PENDIENTE — completar]_
+- **Grupo:** _[PENDIENTE — completar]_
+
+## Resumen de la actividad
+
+Este repositorio documenta la investigación y la implementación práctica de un servidor
+MCP (*Model Context Protocol*) de sistema de archivos conectado a un cliente real
+(**Claude Code**). El objetivo es entender cómo un modelo de lenguaje, aislado por
+diseño del sistema de archivos local, puede llegar a operar sobre archivos de una
+máquina de forma controlada, y distinguir con precisión ese mecanismo (MCP) de una
+integración vía API tradicional.
+
+## Índice de la investigación (`docs/`)
+
+| Documento | Contenido |
+|---|---|
+| [`docs/01-evolucion-modelos.md`](docs/01-evolucion-modelos.md) | Qué es un LM, evolución a LLM, y qué habilita el razonamiento explícito |
+| [`docs/02-aislamiento.md`](docs/02-aislamiento.md) | Por qué un LLM no puede ver ni modificar archivos por sí mismo |
+| [`docs/03-mcp-vs-api.md`](docs/03-mcp-vs-api.md) | **Punto central**: MCP frente a una API, con tabla comparativa |
+| [`docs/04-arquitectura-mcp.md`](docs/04-arquitectura-mcp.md) | Modelo host/cliente/servidor, primitivas, transportes, versión de la especificación |
+| [`docs/05-servidor-filesystem.md`](docs/05-servidor-filesystem.md) | El servidor de referencia de sistema de archivos: herramientas y alcance |
+| [`docs/06-seguridad.md`](docs/06-seguridad.md) | Riesgos y mitigaciones |
+| [`docs/07-casos-de-uso.md`](docs/07-casos-de-uso.md) | Herramientas reales que implementan MCP hoy |
+
+## Tabla comparativa: MCP frente a una API
+
+*(Versión resumida — la versión completa con explicación está en [`docs/03-mcp-vs-api.md`](docs/03-mcp-vs-api.md))*
+
+| Criterio | API tradicional | MCP |
+|---|---|---|
+| Quién decide qué se invoca | La persona desarrolladora, en tiempo de diseño (código fijo de antemano) | El modelo, en tiempo de ejecución, según el pedido del usuario |
+| Descubrimiento de capacidades | Leyendo documentación externa antes de programar | El cliente pregunta al servidor en tiempo real (`tools/list`) |
+| Acoplamiento cliente–servicio | Alto (código escrito contra un contrato específico) | Bajo (cliente genérico que habla el protocolo, no la API de fondo) |
+| Formato de mensajes | Variable (REST/JSON, GraphQL, gRPC, XML, etc.) | Estandarizado: JSON-RPC 2.0 |
+| Autenticación / consentimiento | Token/API key definida por cada proveedor; se autoriza una vez | Contempla consentimiento humano explícito por acción, gestionado por el host |
+| Reutilización entre apps distintas | Baja: cada app reimplementa su propio cliente | Alta: un mismo servidor MCP sirve a cualquier cliente MCP sin cambios |
+
+**Importante:** MCP no sustituye a las APIs — casi todo servidor MCP envuelve una API o
+recurso ya existente. Es una capa de descubrimiento e invocación pensada para que un
+modelo la use, no un reemplazo de la lógica que hay debajo.
+
+## Instrucciones de instalación (reproducibles en una máquina limpia)
+
+### Sistema operativo y versiones utilizadas
+
+- **SO:** Windows 11 Home (build 26200)
+- **Git:** 2.50.1.windows.1
+- **Node.js:** v24.18.0
+- **npm:** 11.16.0
+- **Claude Code (CLI/app):** 2.1.272
+- **Servidor MCP:** `@modelcontextprotocol/server-filesystem` (instalado on-demand vía `npx`, sin instalación global)
+
+### Prerrequisitos
+
+1. Tener [Node.js](https://nodejs.org/) (incluye `npm`) instalado — versión 18 o superior.
+2. Tener [Claude Code](https://claude.com/claude-code) instalado (`npm install -g @anthropic-ai/claude-code` o el instalador de la app de escritorio) y haber iniciado sesión.
+3. Tener [Git](https://git-scm.com/) instalado.
+
+### Paso a paso
+
+```bash
+# 1. Clonar este repositorio
+git clone https://github.com/Javier-Gamez/Tarea1-Moviles.git
+cd Tarea1-Moviles
+
+# 2. Registrar el servidor MCP de sistema de archivos, con el alcance
+#    restringido al directorio workspace/ de este mismo repositorio.
+#    (--scope project guarda la configuración en .mcp.json, ya incluido
+#    en este repo — este paso ya está hecho si clonaste el repo, pero se
+#    documenta para reproducirlo desde cero en cualquier proyecto):
+claude mcp add filesystem --scope project -- npx -y @modelcontextprotocol/server-filesystem "$(pwd)/workspace"
+
+# 3. Verificar que Claude Code reconoce el servidor:
+claude mcp list
+claude mcp get filesystem
+
+# 4. Abrir una sesión de Claude Code en esta carpeta:
+claude
+#    La primera vez, la app pedirá aprobar/confiar en el servidor "filesystem"
+#    definido en .mcp.json — hay que aceptarlo explícitamente (consentimiento
+#    humano). Una vez aprobado, las herramientas mcp__filesystem__* quedan
+#    disponibles en la conversación.
+```
+
+### Contenido de `.mcp.json` (config usada, sin credenciales)
+
+```json
+{
+  "mcpServers": {
+    "filesystem": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "<ruta-absoluta-al-repo>/workspace"
+      ],
+      "env": {}
+    }
+  }
+}
+```
+
+El servidor de sistema de archivos no requiere ninguna credencial: su único "secreto" es
+la ruta del directorio al que tiene acceso, y esa ruta ni siquiera es sensible.
+
+## Evidencias
+
+### 1. El cliente reconoce el servidor y lista sus herramientas
+_[PENDIENTE — captura de `claude mcp list` / `claude mcp get filesystem` y de la lista de herramientas `mcp__filesystem__*` dentro de una conversación]_
+
+### 2. Listar el contenido del directorio autorizado
+_[PENDIENTE — captura]_
+
+### 3. Leer un archivo existente
+_[PENDIENTE — captura]_
+
+### 4. Crear un archivo nuevo y escribir contenido
+_[PENDIENTE — captura]_
+
+### 5. Modificar un archivo existente
+_[PENDIENTE — captura]_
+
+### 6. Buscar un archivo por nombre o contenido
+_[PENDIENTE — captura]_
+
+## 4. Prueba del límite de seguridad
+
+_[PENDIENTE — se le pide al modelo acceder a un archivo fuera de `workspace/` (por
+ejemplo, algo en `C:\Users\JAVIER\Documents`), se documenta aquí la respuesta exacta
+obtenida y se explica que el mecanismo que impide la operación es la validación de rutas
+permitidas dentro del propio proceso del servidor MCP (ver
+[`docs/05-servidor-filesystem.md`](docs/05-servidor-filesystem.md)), no un filtro del
+modelo ni del cliente.]_
+
+## Servidor MCP propio (opcional)
+
+_[PENDIENTE si se decide implementar la parte opcional — ver carpeta `servidor-propio/`]_
+
+## Conclusiones personales
+
+> **Nota:** esta sección debe escribirla el autor de la tarea con sus propias palabras y
+> su propia reflexión — no se completa automáticamente, precisamente porque es la parte
+> que el profesor pide que no se delegue. Algunas preguntas guía: ¿qué cambió tu
+> percepción de "usar IA" después de esta actividad? ¿Qué te pareció más sorprendente
+> del mecanismo de descubrimiento de herramientas? ¿Qué riesgos te parecen más serios
+> ahora que los viste en la práctica y no solo en teoría?
+
+_[PENDIENTE — completar personalmente]_
+
+## Referencias (formato APA)
+
+Anthropic. (2024, November 25). *Introducing the Model Context Protocol*. https://www.anthropic.com/news/model-context-protocol
+
+Model Context Protocol. (2026). *Specification* (Version 2026-07-28). https://modelcontextprotocol.io/specification/2026-07-28
+
+Model Context Protocol. (n.d.). *Architecture*. Retrieved September 20, 2026, from https://modelcontextprotocol.io/specification/2026-07-28/architecture
+
+Model Context Protocol. (n.d.). *Filesystem server* [Source code repository]. GitHub. https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem
+
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł., & Polosukhin, I. (2017). Attention is all you need. *Advances in Neural Information Processing Systems, 30*. https://arxiv.org/abs/1706.03762
+
+Google Developers Blog. (2025). *Build with Google Antigravity, our new agentic development platform*. https://developers.googleblog.com/build-with-google-antigravity-our-new-agentic-development-platform/
+
+_[Agregar aquí cualquier otra fuente consultada durante la investigación]_
