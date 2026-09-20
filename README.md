@@ -69,10 +69,17 @@ git clone https://github.com/Javier-Gamez/Tarea1-Moviles.git
 cd Tarea1-Moviles
 
 # 2. Registrar el servidor MCP de sistema de archivos, con el alcance
-#    restringido al directorio workspace/ de este mismo repositorio.
+#    apuntado al directorio workspace/ de este mismo repositorio.
 #    (--scope project guarda la configuración en .mcp.json, ya incluido
 #    en este repo — este paso ya está hecho si clonaste el repo, pero se
-#    documenta para reproducirlo desde cero en cualquier proyecto):
+#    documenta para reproducirlo desde cero en cualquier proyecto).
+#    NOTA: Claude Code, como cliente, usa el protocolo de "roots" y le
+#    comunica al servidor la carpeta del proyecto como alcance, lo cual
+#    REEMPLAZA este argumento — el alcance real termina siendo toda la
+#    carpeta del repo, no solo workspace/. Ver la explicación completa
+#    en docs/05-servidor-filesystem.md ("Hallazgo práctico"). Aun así,
+#    se documenta este comando porque es el mecanismo primario que
+#    define el servidor y el que aplicaría con un cliente sin roots.
 claude mcp add filesystem --scope project -- npx -y @modelcontextprotocol/server-filesystem "$(pwd)/workspace"
 
 # 3. Verificar que Claude Code reconoce el servidor:
@@ -112,31 +119,82 @@ la ruta del directorio al que tiene acceso, y esa ruta ni siquiera es sensible.
 ## Evidencias
 
 ### 1. El cliente reconoce el servidor y lista sus herramientas
-_[PENDIENTE — captura de `claude mcp list` / `claude mcp get filesystem` y de la lista de herramientas `mcp__filesystem__*` dentro de una conversación]_
+
+Al abrir una sesión de Claude Code en esta carpeta, la app detectó el `.mcp.json` del
+proyecto y pidió aprobación explícita antes de conectar el servidor:
+
+![Diálogo de aprobación del servidor MCP](img/01-aprobacion-servidor-mcp.png)
+
+Tras aprobarlo, la sesión reportó las siguientes herramientas del servidor `filesystem`
+disponibles: `read_file`/`read_text_file`, `read_multiple_files`, `read_media_file`,
+`write_file`, `edit_file`, `create_directory`, `list_directory`,
+`list_directory_with_sizes`, `directory_tree`, `move_file`, `search_files`,
+`get_file_info`, `list_allowed_directories`.
+
+_[PENDIENTE — captura de esa respuesta listando las herramientas]_
 
 ### 2. Listar el contenido del directorio autorizado
+
+Herramienta usada: `list_directory` sobre `workspace/`. Resultado:
+```
+[FILE] README.md
+```
 _[PENDIENTE — captura]_
 
 ### 3. Leer un archivo existente
+
+Herramienta usada: `read_text_file` sobre `workspace/README.md`. Devolvió el contenido
+completo del archivo correctamente.
 _[PENDIENTE — captura]_
 
 ### 4. Crear un archivo nuevo y escribir contenido
+
+Herramienta usada: `write_file` para crear `workspace/nota-demo.txt` con contenido
+nuevo. Resultado: `Successfully wrote to ...\workspace\nota-demo.txt`.
 _[PENDIENTE — captura]_
 
 ### 5. Modificar un archivo existente
+
+Herramienta usada: `edit_file` sobre `workspace/nota-demo.txt`, agregando una línea. La
+herramienta devolvió un diff estilo git confirmando el cambio exacto:
+```diff
+ Este archivo fue creado por el modelo a traves de la herramienta write_file
+ del servidor MCP de sistema de archivos, como evidencia de la Parte 2 de la actividad.
+
+ Fecha de la demostracion: 2026-09-20
++Esta linea se agrego despues, usando la herramienta edit_file, para demostrar la operacion de modificacion de un archivo existente.
+```
 _[PENDIENTE — captura]_
 
 ### 6. Buscar un archivo por nombre o contenido
+
+Herramienta usada: `search_files` con el patrón `*demo*` sobre `workspace/`. Encontró
+`workspace/nota-demo.txt`.
 _[PENDIENTE — captura]_
 
 ## 4. Prueba del límite de seguridad
 
-_[PENDIENTE — se le pide al modelo acceder a un archivo fuera de `workspace/` (por
-ejemplo, algo en `C:\Users\JAVIER\Documents`), se documenta aquí la respuesta exacta
-obtenida y se explica que el mecanismo que impide la operación es la validación de rutas
-permitidas dentro del propio proceso del servidor MCP (ver
-[`docs/05-servidor-filesystem.md`](docs/05-servidor-filesystem.md)), no un filtro del
-modelo ni del cliente.]_
+Primero verificamos el alcance real con `list_allowed_directories`, que reveló que —por
+el mecanismo de *roots* explicado en
+[`docs/05-servidor-filesystem.md`](docs/05-servidor-filesystem.md)— el alcance efectivo
+es toda la carpeta `mcp-filesystem-actividad/`, no solo `workspace/`. Con ese dato,
+probamos acceder a un archivo **fuera** de esa carpeta:
+
+Se le pidió al modelo leer `C:\Users\JAVIER\Documents\Moviles-GH\Tareas\credenciales-secretas.txt`
+(fuera del directorio permitido). Respuesta exacta obtenida:
+
+```
+Access denied - path outside allowed directories: C:\Users\JAVIER\Documents\Moviles-GH\Tareas\credenciales-secretas.txt not in C:\Users\JAVIER\Documents\Moviles-GH\Tareas\mcp-filesystem-actividad
+```
+
+El mecanismo que impidió la operación **no** es un filtro del modelo ni una decisión del
+cliente: es la validación de rutas que el propio **proceso servidor** de
+`@modelcontextprotocol/server-filesystem` hace contra su lista de directorios
+permitidos, antes incluso de comprobar si el archivo existe. El modelo nunca llegó a
+tocar el sistema de archivos fuera del alcance autorizado; solo recibió, como cualquier
+otro resultado de herramienta, el mensaje de error como texto.
+
+_[PENDIENTE — captura de este intercambio]_
 
 ## Servidor MCP propio (opcional)
 

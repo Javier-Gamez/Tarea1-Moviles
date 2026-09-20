@@ -54,17 +54,46 @@ npx -y @modelcontextprotocol/server-filesystem "C:\ruta\al\directorio\permitido"
 (La especificación también contempla que el **cliente** le comunique al servidor una
 lista de *roots* en tiempo de ejecución, la cual —cuando se provee— reemplaza el alcance
 definido por línea de comandos; ver la nota sobre *roots* en
-[`04-arquitectura-mcp.md`](04-arquitectura-mcp.md). En nuestra instalación usamos
-únicamente el argumento de línea de comandos, que es el mecanismo primario y el más
-simple de verificar.)
+[`04-arquitectura-mcp.md`](04-arquitectura-mcp.md).
+
+### Hallazgo práctico: los *roots* del cliente sobreescriben el argumento de línea de comandos
+
+En la configuración inicial de este trabajo apuntamos el argumento de línea de comandos
+al subdirectorio [`workspace/`](../workspace/), con la intención de que ese fuera el
+único alcance del servidor. Al verificar con la herramienta `list_allowed_directories`
+**después** de conectar el servidor desde Claude Code, el resultado real fue distinto:
+
+```
+Allowed directories:
+C:\Users\JAVIER\Documents\Moviles-GH\Tareas\mcp-filesystem-actividad
+```
+
+Es decir, el alcance efectivo terminó siendo **toda la carpeta del proyecto**, no solo
+`workspace/`. La causa es exactamente el mecanismo descrito arriba: Claude Code, como
+cliente, sí soporta el protocolo de *roots* y le comunica al servidor, al conectarse, la
+carpeta del proyecto donde se abrió la sesión como *root* — y esa notificación
+**reemplaza por completo** el argumento de línea de comandos que configuramos
+manualmente, tal como documenta el propio servidor de referencia ("client roots,
+notified to the server, completely replace any server-side allowed directories when
+provided").
+
+Esto es una lección de seguridad real, no solo teórica: **delimitar el alcance
+únicamente por línea de comandos no garantiza cuál va a ser el alcance final** — depende
+también de qué le comunique el cliente al servidor, y eso hay que **verificarlo en la
+práctica** (con `list_allowed_directories`), no darlo por hecho a partir de la
+configuración escrita. Por eso, en el resto de este trabajo, el "directorio de trabajo
+delimitado" al que nos referimos es la carpeta completa del proyecto
+(`mcp-filesystem-actividad/`) — que sigue siendo una carpeta creada específicamente para
+esta actividad, y **no** la carpeta de usuario completa ni la raíz del disco, cumpliendo
+igualmente con lo que pide la actividad, aunque más amplia que el subdirectorio
+`workspace/` que habíamos planeado originalmente.
 
 Toda ruta que el modelo intente usar en una llamada a herramienta se valida **dentro del
 proceso servidor** contra esa lista de directorios permitidos, antes de tocar el disco.
 Si la ruta resuelta (después de normalizar `..`, enlaces simbólicos, etc.) cae fuera de
 los directorios permitidos, el servidor rechaza la operación y devuelve un error — el
-modelo nunca llega a tocar el archivo. En este trabajo delimitamos el acceso a la
-carpeta [`workspace/`](../workspace/) de este mismo repositorio, creada específicamente
-para esta actividad.
+modelo nunca llega a tocar el archivo, ni siquiera para verificar si existe (ver la
+prueba del límite de seguridad en el [`README.md`](../README.md)).
 
 ## 5.4 Por qué existe ese límite y qué pasaría sin él
 
