@@ -2,7 +2,7 @@
 
 ## Datos de identificación
 
-- **Nombre completo:** _[PENDIENTE — completar]_
+- **Nombre completo:** Javier de Jesús Gámez Rosas
 - **Número de boleta:** _[PENDIENTE — completar]_
 - **Grupo:** _[PENDIENTE — completar]_
 
