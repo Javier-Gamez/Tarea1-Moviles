@@ -15,6 +15,12 @@ diseño del sistema de archivos local, puede llegar a operar sobre archivos de u
 máquina de forma controlada, y distinguir con precisión ese mecanismo (MCP) de una
 integración vía API tradicional.
 
+## Presentación
+
+Diapositivas de apoyo para la exposición: [`presentacion/presentacion-mcp.pptx`](presentacion/presentacion-mcp.pptx)
+(10 diapositivas, pensadas como apoyo visual — no para leer en voz alta — con espacio
+reservado para la demostración en vivo).
+
 ## Índice de la investigación (`docs/`)
 
 | Documento | Contenido |
