@@ -15,6 +15,23 @@ diseño del sistema de archivos local, puede llegar a operar sobre archivos de u
 máquina de forma controlada, y distinguir con precisión ese mecanismo (MCP) de una
 integración vía API tradicional.
 
+## Elección del cliente
+
+Se eligió **Claude Code** (CLI y app de escritorio de Anthropic) como cliente MCP para
+esta actividad por tres razones concretas:
+
+1. Soporta servidores MCP configurados por proyecto (`.mcp.json`), lo que permite que
+   cualquier persona que clone este repositorio reproduzca exactamente la misma
+   configuración sin pasos adicionales.
+2. Es una de las opciones que el propio enunciado de la actividad lista como válida, y
+   al mismo tiempo es la herramienta con la que ya se trabajaba en este proyecto, lo que
+   permitió centrar el esfuerzo en entender el protocolo en vez de en aprender una
+   herramienta nueva desde cero.
+3. Su CLI hace explícito, en la terminal, el momento exacto de aprobación del servidor
+   (ver evidencia 1 más abajo) — lo cual sirvió directamente para demostrar en la
+   práctica el principio de **consentimiento humano** que exige la especificación de
+   MCP, en vez de solo describirlo en la teoría.
+
 ## Presentación
 
 Diapositivas de apoyo para la exposición: [`presentacion/presentacion-mcp.pptx`](presentacion/presentacion-mcp.pptx)
