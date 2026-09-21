@@ -197,9 +197,9 @@ otro resultado de herramienta, el mensaje de error como texto.
 
 1. Antes de esta actividad, para mí usar Ia era usarla de una manera diferente sin tomar en cuenta todo el potencial que tiene. Instalar el servidor de sistema de archivos me hizo ver algo que no estaba a simple vista para mi, el modelo nunca "gana" acceso a mi computadora por sí mismo ya que sigue siendo una función de texto a texto , solo que ahora hay un programa intermediario (el servidor MCP) que sí tiene permisos reales, y que decide, dentro de los límites que yo configuré, qué operación ejecutar.
 
-Aprendí que el cliente (Claude Code) le puede comunicar al servidor su propia idea de qué directorios son "relevantes" (los roots), me dejó claro que el descubrimiento de herramientas no es solo "el servidor anuncia lo que tiene", también hay negociación entre cliente y servidor que yo no controlo directamente, y que hay que verificar en la práctica.
+2. Aprendí que el cliente (Claude Code) le puede comunicar al servidor su propia idea de qué directorios son "relevantes" (los roots), me dejó claro que el descubrimiento de herramientas no es solo "el servidor anuncia lo que tiene", también hay negociación entre cliente y servidor que yo no controlo directamente, y que hay que verificar en la práctica.
 
-El "acceso a rutas fuera del directorio autorizado" suena a un riesgo, pero me di cuanta que el alcance real de un servidor MCP puede terminar siendo más amplio de lo que uno configuró, sin que nada te avise, creo que esto es más serio que la inyección de instrucciones en sí, porque si ni siquiera el desarrollador puede confiar en que su configuración de alcance se respete sin verificarla cada vez, un usuario final mucho menos lo va a hacer.
+3. El "acceso a rutas fuera del directorio autorizado" suena a un riesgo, pero me di cuanta que el alcance real de un servidor MCP puede terminar siendo más amplio de lo que uno configuró, sin que nada te avise, creo que esto es más serio que la inyección de instrucciones en sí, porque si ni siquiera el desarrollador puede confiar en que su configuración de alcance se respete sin verificarla cada vez, un usuario final mucho menos lo va a hacer.
 
 
 ## Referencias (formato APA)
