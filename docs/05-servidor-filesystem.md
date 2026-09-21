@@ -81,12 +81,21 @@ Esto es una lección de seguridad real, no solo teórica: **delimitar el alcance
 únicamente por línea de comandos no garantiza cuál va a ser el alcance final** — depende
 también de qué le comunique el cliente al servidor, y eso hay que **verificarlo en la
 práctica** (con `list_allowed_directories`), no darlo por hecho a partir de la
-configuración escrita. Por eso, en el resto de este trabajo, el "directorio de trabajo
-delimitado" al que nos referimos es la carpeta completa del proyecto
+configuración escrita. En cualquier caso, el "directorio de trabajo delimitado" nunca
+fue más amplio que la carpeta completa del proyecto
 (`mcp-filesystem-actividad/`) — que sigue siendo una carpeta creada específicamente para
 esta actividad, y **no** la carpeta de usuario completa ni la raíz del disco, cumpliendo
-igualmente con lo que pide la actividad, aunque más amplia que el subdirectorio
-`workspace/` que habíamos planeado originalmente.
+igualmente con lo que pide la actividad.
+
+**Actualización:** al repetir esta misma verificación en sesiones posteriores (algunas
+por la app de escritorio, otras por una terminal normal ejecutando `claude`), el
+resultado de `list_allowed_directories` **no fue siempre el mismo**: unas veces devolvió
+la carpeta completa del proyecto (como arriba) y otras veces devolvió únicamente
+`workspace/`, tal como se había configurado por línea de comandos. No identificamos con
+certeza qué determina cuál de los dos ocurre en cada sesión — parece depender de detalles
+de cómo esa sesión específica negocia el protocolo de *roots* con el servidor. La
+conclusión práctica se mantiene, y se refuerza: **no asumas el alcance, verifícalo con
+`list_allowed_directories` antes de cada demostración.**
 
 Toda ruta que el modelo intente usar en una llamada a herramienta se valida **dentro del
 proceso servidor** contra esa lista de directorios permitidos, antes de tocar el disco.

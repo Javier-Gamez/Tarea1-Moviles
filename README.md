@@ -17,8 +17,8 @@ integración vía API tradicional.
 
 ## Presentación
 
-Diapositivas de apoyo para la exposición: en preparación — se agregan a este repositorio
-(carpeta `presentacion/`) antes de la exposición en vivo.
+Diapositivas de apoyo para la exposición: [`presentacion/presentacion-mcp.pptx`](presentacion/presentacion-mcp.pptx)
+(8 diapositivas, pensadas como apoyo visual — no para leer en voz alta).
 
 ## Índice de la investigación (`docs/`)
 
@@ -78,13 +78,15 @@ cd Tarea1-Moviles
 #    (--scope project guarda la configuración en .mcp.json, ya incluido
 #    en este repo — este paso ya está hecho si clonaste el repo, pero se
 #    documenta para reproducirlo desde cero en cualquier proyecto).
-#    NOTA: Claude Code, como cliente, usa el protocolo de "roots" y le
-#    comunica al servidor la carpeta del proyecto como alcance, lo cual
-#    REEMPLAZA este argumento — el alcance real termina siendo toda la
-#    carpeta del repo, no solo workspace/. Ver la explicación completa
-#    en docs/05-servidor-filesystem.md ("Hallazgo práctico"). Aun así,
-#    se documenta este comando porque es el mecanismo primario que
-#    define el servidor y el que aplicaría con un cliente sin roots.
+#    NOTA: Claude Code, como cliente, soporta el protocolo de "roots", que
+#    -cuando se activa- REEMPLAZA este argumento con la carpeta que el
+#    cliente le comunique al servidor. En la práctica, el alcance real
+#    varió entre sesiones que probamos: a veces fue exactamente
+#    workspace/ (como se configuró aquí), y otras veces fue la carpeta
+#    completa del repositorio. Por eso, antes de cualquier operación
+#    sensible, verifica el alcance real con list_allowed_directories en
+#    vez de asumirlo por esta configuración. Ver la explicación completa
+#    en docs/05-servidor-filesystem.md ("Hallazgo práctico").
 claude mcp add filesystem --scope project -- npx -y @modelcontextprotocol/server-filesystem "$(pwd)/workspace"
 
 # 3. Verificar que Claude Code reconoce el servidor:
@@ -171,11 +173,13 @@ Herramienta usada: `search_files` con el patrón `*demo*` sobre `workspace/`. En
 
 ## 4. Prueba del límite de seguridad
 
-Primero verificamos el alcance real con `list_allowed_directories`, que reveló que —por
-el mecanismo de *roots* explicado en
-[`docs/05-servidor-filesystem.md`](docs/05-servidor-filesystem.md)— el alcance efectivo
-es toda la carpeta `mcp-filesystem-actividad/`, no solo `workspace/`. Con ese dato,
-probamos acceder a un archivo **fuera** de esa carpeta:
+Primero verificamos el alcance real con `list_allowed_directories`. En esta prueba en
+particular, el resultado fue toda la carpeta `mcp-filesystem-actividad/`, no solo
+`workspace/` — por el mecanismo de *roots* explicado en
+[`docs/05-servidor-filesystem.md`](docs/05-servidor-filesystem.md). (Nota: en otras
+sesiones ese mismo comando devolvió solo `workspace/`; el resultado varía, por eso
+conviene verificarlo cada vez en vez de asumirlo.) Con el alcance de esta prueba,
+intentamos acceder a un archivo **fuera** de esa carpeta:
 
 Se le pidió al modelo leer `C:\Users\JAVIER\Documents\Moviles-GH\Tareas\credenciales-secretas.txt`
 (fuera del directorio permitido). Respuesta exacta obtenida:
