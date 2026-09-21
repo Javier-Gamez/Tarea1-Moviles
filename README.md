@@ -3,8 +3,8 @@
 ## Datos de identificación
 
 - **Nombre completo:** Javier de Jesús Gámez Rosas
-- **Número de boleta:** _[PENDIENTE — completar]_
-- **Grupo:** _[PENDIENTE — completar]_
+- **Número de boleta:** 2022630007
+- **Grupo:** 7CV4
 
 ## Resumen de la actividad
 
@@ -17,9 +17,8 @@ integración vía API tradicional.
 
 ## Presentación
 
-Diapositivas de apoyo para la exposición: [`presentacion/presentacion-mcp.pptx`](presentacion/presentacion-mcp.pptx)
-(10 diapositivas, pensadas como apoyo visual — no para leer en voz alta — con espacio
-reservado para la demostración en vivo).
+Diapositivas de apoyo para la exposición: en preparación — se agregan a este repositorio
+(carpeta `presentacion/`) antes de la exposición en vivo.
 
 ## Índice de la investigación (`docs/`)
 
