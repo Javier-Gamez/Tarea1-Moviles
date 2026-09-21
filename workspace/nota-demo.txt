@@ -1,5 +1,2 @@
 Este archivo fue creado por el modelo a traves de la herramienta write_file
-del servidor MCP de sistema de archivos, como evidencia de la Parte 2 de la actividad.
-
-Fecha de la demostracion: 2026-09-20
-Esta linea se agrego despues, usando la herramienta edit_file, para demostrar la operacion de modificacion de un archivo existente.
+del servidor MCP de sistema de archivos
